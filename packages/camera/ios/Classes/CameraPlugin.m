@@ -226,6 +226,8 @@ FourCharCode const videoFormat = kCVPixelFormatType_32BGRA;
     presetIndex = 0;
   } else if ([resolutionPreset isEqualToString:@"medium"]) {
     presetIndex = 2;
+  } else if ([resolutionPreset isEqualToString:@"photo"]) {
+     presetIndex = 5;
   } else {
     NSAssert([resolutionPreset isEqualToString:@"low"], @"Unknown resolution preset %@",
              resolutionPreset);
@@ -261,6 +263,12 @@ FourCharCode const videoFormat = kCVPixelFormatType_32BGRA;
       if ([_captureSession canSetSessionPreset:AVCaptureSessionPreset352x288]) {
         _captureSession.sessionPreset = AVCaptureSessionPreset352x288;
         _previewSize = CGSizeMake(352, 288);
+        break;
+      }
+    case 5:
+      if ([_captureSession canSetSessionPreset:AVCaptureSessionPresetPhoto]) {
+        _captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
+        _previewSize = CGSizeMake(1280, 960);
         break;
       }
     default: {
