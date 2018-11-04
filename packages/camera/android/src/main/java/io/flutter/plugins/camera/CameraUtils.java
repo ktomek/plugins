@@ -3,13 +3,16 @@ package io.flutter.plugins.camera;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.CamcorderProfile;
+import android.util.Log;
 import android.util.Size;
+
 import io.flutter.plugins.camera.Camera.ResolutionPreset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +27,18 @@ public final class CameraUtils {
 
   private CameraUtils() {}
 
-  static Size computeBestPreviewSize(String cameraName, ResolutionPreset preset) {
+  static Size computeBestPreviewSize(String cameraName, ResolutionPreset preset, StreamConfigurationMap streamConfigurationMap) {
+    if(preset == ResolutionPreset.photo) {
+      List<Size> sizes =  Arrays.asList(streamConfigurationMap.getOutputSizes(SurfaceTexture.class));
+      Collections.sort(sizes, new CompareSizesByArea());
+      Collections.reverse(sizes);
+      for(int i=0; i < sizes.size(); i++) {
+        if(1.0*sizes.get(i).getWidth()/sizes.get(i).getHeight() == 4.0/3.0 && sizes.get(i).getHeight() <= 2000) {
+          return sizes.get(i);
+        }
+      }
+    }
+
     if (preset.ordinal() > ResolutionPreset.high.ordinal()) {
       preset = ResolutionPreset.high;
     }
@@ -75,6 +89,10 @@ public final class CameraUtils {
     int cameraId = Integer.parseInt(cameraName);
     switch (preset) {
         // All of these cases deliberately fall through to get the best available profile.
+      case photo:
+        if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_HIGH)) {
+          return CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
+        }
       case max:
         if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_HIGH)) {
           return CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);

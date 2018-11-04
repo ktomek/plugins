@@ -127,6 +127,7 @@ typedef enum {
   veryHigh,
   ultraHigh,
   max,
+  photo
 } ResolutionPreset;
 
 static ResolutionPreset getResolutionPresetForString(NSString *preset) {
@@ -144,6 +145,8 @@ static ResolutionPreset getResolutionPresetForString(NSString *preset) {
     return ultraHigh;
   } else if ([preset isEqualToString:@"max"]) {
     return max;
+  } else if ([preset isEqualToString:@"photo"]) {
+    return photo;
   } else {
     NSError *error = [NSError errorWithDomain:NSCocoaErrorDomain
                                          code:NSURLErrorUnknown
@@ -279,6 +282,12 @@ FourCharCode const videoFormat = kCVPixelFormatType_32BGRA;
 
 - (void)setCaptureSessionPreset:(ResolutionPreset)resolutionPreset {
   switch (resolutionPreset) {
+    case photo:
+        if ([_captureSession canSetSessionPreset:AVCaptureSessionPresetPhoto]) {
+          _captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
+          _previewSize = CGSizeMake(1280, 960);
+          break;
+        }
     case max:
       if ([_captureSession canSetSessionPreset:AVCaptureSessionPresetHigh]) {
         _captureSession.sessionPreset = AVCaptureSessionPresetHigh;

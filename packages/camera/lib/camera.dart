@@ -36,6 +36,8 @@ enum ResolutionPreset {
 
   /// The highest resolution available.
   max,
+
+  photo
 }
 
 typedef onLatestImageAvailable = Function(CameraImage image);
@@ -55,6 +57,8 @@ String serializeResolutionPreset(ResolutionPreset resolutionPreset) {
       return 'medium';
     case ResolutionPreset.low:
       return 'low';
+    case ResolutionPreset.photo:
+      return 'photo';
   }
   throw ArgumentError('Unknown ResolutionPreset value');
 }

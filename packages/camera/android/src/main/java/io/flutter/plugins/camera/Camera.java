@@ -1,6 +1,7 @@
 package io.flutter.plugins.camera;
 
 import static android.view.OrientationEventListener.ORIENTATION_UNKNOWN;
+import static io.flutter.plugins.camera.CameraUtils.computeBestCaptureSize;
 import static io.flutter.plugins.camera.CameraUtils.computeBestPreviewSize;
 
 import android.annotation.SuppressLint;
@@ -21,6 +22,7 @@ import android.media.CamcorderProfile;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaRecorder;
+import android.util.Log;
 import android.util.Size;
 import android.view.OrientationEventListener;
 import android.view.Surface;
@@ -69,6 +71,7 @@ public class Camera {
     veryHigh,
     ultraHigh,
     max,
+    photo
   }
 
   public Camera(
@@ -110,8 +113,12 @@ public class Camera {
     ResolutionPreset preset = ResolutionPreset.valueOf(resolutionPreset);
     recordingProfile =
         CameraUtils.getBestAvailableCamcorderProfileForResolutionPreset(cameraName, preset);
-    captureSize = new Size(recordingProfile.videoFrameWidth, recordingProfile.videoFrameHeight);
-    previewSize = computeBestPreviewSize(cameraName, preset);
+    if(preset == ResolutionPreset.photo) {
+      captureSize = computeBestCaptureSize(streamConfigurationMap);
+    } else {
+      captureSize = new Size(recordingProfile.videoFrameWidth, recordingProfile.videoFrameHeight);
+    }
+    previewSize = computeBestPreviewSize(cameraName, preset, streamConfigurationMap);
   }
 
   public void setupCameraEventChannel(EventChannel cameraEventChannel) {
