@@ -183,6 +183,7 @@ FourCharCode const videoFormat = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
     _previewSize = CGSizeMake(640, 480);
   } else if ([resolutionPreset isEqualToString:@"photo"]) {
       preset = AVCaptureSessionPresetPhoto;
+      _previewSize = CGSizeMake(1024, 768);
   } else {
     NSAssert([resolutionPreset isEqualToString:@"low"], @"Unknown resolution preset %@",
              resolutionPreset);
