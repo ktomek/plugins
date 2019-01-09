@@ -182,8 +182,8 @@ FourCharCode const videoFormat = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
     preset = AVCaptureSessionPreset640x480;
     _previewSize = CGSizeMake(640, 480);
   } else if ([resolutionPreset isEqualToString:@"photo"]) {
-      preset = AVCaptureSessionPresetPhoto;
-      _previewSize = CGSizeMake(1024, 768);
+     preset = AVCaptureSessionPresetPhoto;
+     _previewSize = CGSizeMake(1024, 768);
   } else {
     NSAssert([resolutionPreset isEqualToString:@"low"], @"Unknown resolution preset %@",
              resolutionPreset);
@@ -206,8 +206,7 @@ FourCharCode const videoFormat = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
                     kvImageNoFlags);
 
   _captureVideoOutput = [AVCaptureVideoDataOutput new];
-  _captureVideoOutput.videoSettings =
-      @{(NSString *)kCVPixelBufferPixelFormatTypeKey : @(videoFormat)};
+  _captureVideoOutput.videoSettings = @{(NSString *)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA)};
   [_captureVideoOutput setAlwaysDiscardsLateVideoFrames:YES];
   [_captureVideoOutput setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
 
@@ -398,8 +397,8 @@ FourCharCode const videoFormat = kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
   while (!OSAtomicCompareAndSwapPtrBarrier(pixelBuffer, nil, (void **)&_latestPixelBuffer)) {
     pixelBuffer = _latestPixelBuffer;
   }
-
-  return [self convertYUVImageToBGRA:pixelBuffer];
+   return pixelBuffer;
+  //return [self convertYUVImageToBGRA:pixelBuffer];
 }
 
 // Since video format was changed to kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange we have to
