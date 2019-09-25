@@ -28,31 +28,41 @@ public final class CameraUtils {
   private CameraUtils() {}
 
   static Size computeBestPreviewSize(String cameraName, ResolutionPreset preset, StreamConfigurationMap streamConfigurationMap) {
-    if(preset == ResolutionPreset.photo) {
-      List<Size> sizes =  Arrays.asList(streamConfigurationMap.getOutputSizes(SurfaceTexture.class));
+    List<Size> sizes =  Arrays.asList(streamConfigurationMap.getOutputSizes(SurfaceTexture.class));
+    return getBestSize(cameraName, preset,2000, sizes);
+  }
+
+  static Size getBestSize(String cameraName, ResolutionPreset preset, int maxSize, List<Size> sizes) {
       Collections.sort(sizes, new CompareSizesByArea());
       Collections.reverse(sizes);
       for(int i=0; i < sizes.size(); i++) {
-        if(1.0*sizes.get(i).getWidth()/sizes.get(i).getHeight() == 4.0/3.0 && sizes.get(i).getHeight() <= 2000) {
+        if(1.0*sizes.get(i).getWidth()/sizes.get(i).getHeight() == 4.0/3.0 && sizes.get(i).getHeight() <= maxSize) {
           return sizes.get(i);
         }
       }
-    }
 
-    if (preset.ordinal() > ResolutionPreset.high.ordinal()) {
-      preset = ResolutionPreset.high;
-    }
-
-    CamcorderProfile profile =
-        getBestAvailableCamcorderProfileForResolutionPreset(cameraName, preset);
+    CamcorderProfile profile = getBestAvailableCamcorderProfileForResolutionPreset(cameraName, preset);
     return new Size(profile.videoFrameWidth, profile.videoFrameHeight);
   }
 
-  static Size computeBestCaptureSize(StreamConfigurationMap streamConfigurationMap) {
+  static Size computeBestCaptureSize(String cameraName, ResolutionPreset preset, StreamConfigurationMap streamConfigurationMap) {
     // For still image captures, we use the largest available size.
-    return Collections.max(
-        Arrays.asList(streamConfigurationMap.getOutputSizes(ImageFormat.JPEG)),
-        new CompareSizesByArea());
+    List<Size> sizes =  Arrays.asList(streamConfigurationMap.getOutputSizes(ImageFormat.JPEG));
+
+    switch (preset) {
+      case max:
+        return getBestSize(cameraName, preset,10000, sizes);
+      case ultraHigh:
+        return getBestSize(cameraName, preset,10000, sizes);
+      case veryHigh:
+        return getBestSize(cameraName, preset,10000, sizes);
+      case high:
+        return getBestSize(cameraName, preset,10000, sizes);
+      case medium:
+        return getBestSize(cameraName, preset,2500, sizes);
+      default:
+        return getBestSize(cameraName, preset,2000, sizes);
+    }
   }
 
   public static List<Map<String, Object>> getAvailableCameras(Activity activity)
@@ -89,10 +99,6 @@ public final class CameraUtils {
     int cameraId = Integer.parseInt(cameraName);
     switch (preset) {
         // All of these cases deliberately fall through to get the best available profile.
-      case photo:
-        if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_HIGH)) {
-          return CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
-        }
       case max:
         if (CamcorderProfile.hasProfile(cameraId, CamcorderProfile.QUALITY_HIGH)) {
           return CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);

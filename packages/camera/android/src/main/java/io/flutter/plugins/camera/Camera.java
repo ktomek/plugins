@@ -70,8 +70,7 @@ public class Camera {
     high,
     veryHigh,
     ultraHigh,
-    max,
-    photo
+    max
   }
 
   public Camera(
@@ -111,13 +110,7 @@ public class Camera {
     isFrontFacing =
         characteristics.get(CameraCharacteristics.LENS_FACING) == CameraMetadata.LENS_FACING_FRONT;
     ResolutionPreset preset = ResolutionPreset.valueOf(resolutionPreset);
-    recordingProfile =
-        CameraUtils.getBestAvailableCamcorderProfileForResolutionPreset(cameraName, preset);
-    if(preset == ResolutionPreset.photo) {
-      captureSize = computeBestCaptureSize(streamConfigurationMap);
-    } else {
-      captureSize = new Size(recordingProfile.videoFrameWidth, recordingProfile.videoFrameHeight);
-    }
+    captureSize = computeBestCaptureSize(cameraName, preset, streamConfigurationMap);
     previewSize = computeBestPreviewSize(cameraName, preset, streamConfigurationMap);
   }
 
